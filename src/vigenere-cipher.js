@@ -71,7 +71,7 @@ const { NotImplementedError } = require('../extensions/index.js');
               }
           });
 
-          return result.join('');
+          return this.type === 'reverse' ? result.reverse().join('') : result.join('');
           
       } else {
           throw new Error('Incorrect arguments!');
@@ -79,15 +79,41 @@ const { NotImplementedError } = require('../extensions/index.js');
   }
   decrypt(...args) {
       if (args[0] !== undefined && args[1] !== undefined) {
-          let string = args[0];
-          let key = args[1];
+          let string = args[0].toUpperCase();
+          let key = args[1].toUpperCase();
 
-          let mult = Math.floor(string.length/key.length) + 1; 
+          let stringChar = [...string].filter(char => this.alphabet.indexOf(char) !== -1);
 
-          let keyString = key.repeat(mult).slice(0,string.length);
 
-          console.log(string);
-          console.log(keyString);
+          let mult = Math.floor(stringChar.length/key.length) + 1; 
+          let keyString = [...key.repeat(mult).slice(0,stringChar.length)].reverse();
+
+          let finalKeyString = [];
+
+          [...string].forEach((char,idx)=>{
+              if(this.alphabet.indexOf(char) !== -1) {
+                  finalKeyString[idx] = keyString.pop();
+              } else {
+                  finalKeyString[idx] = char;
+              }
+          })
+
+          console.log(finalKeyString);
+          console.log([...string]);
+          let result = [];
+
+          [...string].forEach((char, idx) => {
+              if(this.alphabet.indexOf(char) === -1) {
+                  result[idx] = char;
+              } else {
+                  let x = this.alphabet.indexOf(finalKeyString[idx]);
+                  let y = this.tabulaRecta[x].indexOf(char);
+                  let target = this.alphabet[y];
+                  result[idx] = target;
+              }
+          });
+          return this.type === 'reverse' ? result.reverse().join('') : result.join('');
+
       } else {
           throw new Error('Incorrect arguments!');
       }
